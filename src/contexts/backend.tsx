@@ -4,7 +4,7 @@ import ytdl, { chooseFormat, filterFormats, videoFormat } from 'ytdl-core'
 import {io, Socket} from "socket.io-client";
 
 
-const apiUrl = 'http://localhost:3003';
+const apiUrl = process.env.REACT_APP_BACKEND_URL || '';
 
 export class BackendService {
 

@@ -49,7 +49,10 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
   const [formats, setFormats] = useState<LoadingState<videoFormat[]>>({
     data: [],
     loading: false
-  })
+  });
+
+  const [cutFrom, setCutFrom] = useState(0);
+  const [cutTo, setCutTo] = useState(0);
 
   const wasOpened = usePrevious(isOpen)
   const loadingVideo = useRef<string | null>(null)
@@ -77,6 +80,12 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
     }
   })
 
+  useEffect(() => {
+    if(video.duration) {
+      setCutTo(Math.floor(video.duration/1000));
+    }
+  }, [video]);
+
   async function loadFormats() {
     setFormats({ data: [], loading: true })
     try {
@@ -98,10 +107,27 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
 
   async function handleDownload() {
     try {
-      await download(video, formats.data[selected], splitTracks)
+      await download(video, formats.data[selected], splitTracks, {from: cutFrom, to: cutTo})
     } catch (err) {
       console.error(err)
     }
+  }
+
+  const handleCutFromChange = (v: number) => {
+    let nv = Math.max(0, v);
+    setCutFrom(nv);
+    //setCutTo(Math.max(nv, cutTo));
+  }
+
+  const handleCutToChange = (v: number) => {
+    let nv = Math.max(0,
+        Math.min(
+            Math.floor((video.duration || 0) /1000),
+            v
+        )
+    );
+    setCutTo(nv);
+    //setCutFrom(Math.min(nv, cutFrom));
   }
 
   return (
@@ -120,9 +146,18 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
             <YouTube videoId={video.id}
                      opts={{width: '528'}}
             />
-            <Flex direction="row" align="center" justify="flex-start">
-                <Input placeholder='From' />
-                <Input placeholder='To' />
+            <Flex direction="row" align="center" justify="flex-start" style={{marginTop: '8px'}}>
+                <Input placeholder='From'
+                       type={"number"}
+                       value={cutFrom}
+                       onChange={event => handleCutFromChange(parseInt(event.target.value))}
+                       style={{marginRight:'8px'}}
+                />
+                <Input placeholder='To'
+                       type={"number"}
+                       value={cutTo}
+                       onChange={event => handleCutToChange(parseInt(event.target.value))}
+                />
             </Flex>
             {/*<Image
               src={video.thumbnailUrl}

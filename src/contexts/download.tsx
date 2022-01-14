@@ -2,6 +2,7 @@ import React, { createContext, useContext, useCallback, useState, useMemo, useEf
 import { useThrottledCallback } from 'use-debounce'
 import { videoFormat } from 'ytdl-core'
 import produce from 'immer'
+import JsFileDownloader from 'js-file-downloader';
 
 import Video from '../types/Video'
 //import { queueDownload, DownloadController } from '../utils/downloader'
@@ -18,14 +19,15 @@ export type DownloadProgress = {
   total: number
   time: number
   timeLeft: number
+  downloadUrl?: string
 }
 
-export type DownloadFunction = (video: Video, format: videoFormat, splitTracks?: boolean) => Promise<void>;
+export type DownloadFunction = (video: Video, format: videoFormat, splitTracks?: boolean, cut?: Cut) => Promise<void>;
 export type Download = {
   video: Video
   format: videoFormat
   progress: DownloadProgress
-  splitTracks?: boolean
+  splitTracks?: boolean,
 }
 
 export type Downloads = Record<string, Download>
@@ -40,6 +42,11 @@ export interface DownloaderData {
   stop: (video: Video) => void
 }
 
+type Cut = {
+  from: number,
+  to: number,
+}
+
 const DownloaderContext = createContext<DownloaderData>({} as DownloaderData)
 
 export const DownloaderProvider: React.FC = ({ children }) => {
@@ -52,7 +59,7 @@ export const DownloaderProvider: React.FC = ({ children }) => {
     setDownloads(produce(updateFunc))
   }, 300, { leading: true, trailing: true })
 
-  const download: DownloadFunction = useCallback(async (video, format, splitTracks) => {
+  const download: DownloadFunction = useCallback(async (video, format, splitTracks, cut) => {
     if (!video.id) {
       throw new Error('Invalid video id')
     }
@@ -80,6 +87,13 @@ export const DownloaderProvider: React.FC = ({ children }) => {
         //console.log(211, v);
         progressCallback(v);
         if("finished" === v.status){
+          if(v.downloadUrl){
+            new JsFileDownloader({
+              url: v.downloadUrl
+            }).then(() => {
+              console.log('downloaded', v.downloadUrl)
+            });
+          }
           clearDownload(video.id!, 4000);
         }
       });
@@ -89,7 +103,8 @@ export const DownloaderProvider: React.FC = ({ children }) => {
         format,
         splitTracks,
         progressCallback,
-        audioOnly: !format.hasVideo
+        audioOnly: !format.hasVideo,
+        cut
       });
 
       /*await queueDownload({

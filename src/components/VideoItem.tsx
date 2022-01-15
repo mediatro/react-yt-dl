@@ -30,7 +30,7 @@ const VideoItem: React.FC<VideoItemProps> = ({ video }) => {
       onMouseLeave={() => setHover(false)}
     >
       <Box
-        width={{ base: '240px', md: '300px', lg: '360px' }}
+        width={{ base: '144px', md: '300px', lg: '360px' }}
         flexShrink={0}
         overflow="hidden"
         marginRight="4"

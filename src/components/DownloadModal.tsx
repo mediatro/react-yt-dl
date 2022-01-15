@@ -144,7 +144,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
         <ModalBody>
           <Box position="relative">
             <YouTube videoId={video.id}
-                     opts={{width: '528'}}
+                     opts={{width: '100%'}}
             />
             <Flex direction="row" align="center" justify="flex-start" style={{marginTop: '8px'}}>
                 <Input placeholder='From'

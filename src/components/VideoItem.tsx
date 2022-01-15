@@ -20,7 +20,7 @@ const VideoItem: React.FC<VideoItemProps> = ({ video }) => {
     <Flex
       key={video.id!}
       w="100%"
-      height="200px"
+      /*height="200px"*/
       overflow="hidden"
       align="stretch"
       justify="start"
@@ -43,7 +43,7 @@ const VideoItem: React.FC<VideoItemProps> = ({ video }) => {
           src={video.thumbnailUrl}
           fit="cover"
           width="100%"
-          height="100%"
+          /*height="100%"*/
         />
 
         <Text

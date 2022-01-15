@@ -2,6 +2,7 @@ import React, {createContext} from "react";
 import Video from "youtube-sr/dist/Structures/Video";
 import ytdl, { chooseFormat, filterFormats, videoFormat } from 'ytdl-core'
 import {io, Socket} from "socket.io-client";
+import JsFileDownloader from "js-file-downloader";
 
 
 const apiUrl = process.env.REACT_APP_BACKEND_URL || '';
@@ -18,6 +19,14 @@ export class BackendService {
         return fetch(`${apiUrl}/info?v=${v}`).then(value => value.json());
     }
 
+    download(filename: string){
+        return new JsFileDownloader({
+            url: `${apiUrl}/download/${filename}`
+        }).then(() => {
+            console.log('downloaded', filename);
+            //backend.socket.emit('clearDownload', v.downloadFilename);
+        });
+    }
 
 }
 

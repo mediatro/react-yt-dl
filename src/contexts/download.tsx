@@ -91,13 +91,8 @@ export const DownloaderProvider: React.FC = ({ children }) => {
         progressCallback(v);
         if("finished" === v.status){
           console.log(v);
-          if(v.downloadUrl){
-            new JsFileDownloader({
-              url: v.downloadUrl
-            }).then(() => {
-              console.log('downloaded', v.downloadUrl)
-              backend.socket.emit('clearDownload', v.downloadFilename);
-            });
+          if(v.downloadFilename){
+            backend.download(v.downloadFilename);
           }
           clearDownload(video.id!, 4000);
         }

@@ -86,7 +86,7 @@ const FormatsDropdown: React.FC<FormatsDropdownProps> = ({
         ))}
       </Dropdown>
 
-      {audioSelected && (
+      {false && audioSelected && (
         <Checkbox
           checked={splitTracks}
           defaultChecked={splitTracks}

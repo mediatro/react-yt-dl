@@ -196,7 +196,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
           <Progress videoId={video.id!} marginTop="2" />
         </ModalBody>
 
-        <ModalFooter justifyContent="space-between">
+        <ModalFooter justifyContent="space-between" flexDirection={'column'}>
           <FormatsDropdown
             formats={formats.data}
             selected={selected}
@@ -207,7 +207,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
             disabled={formats.loading || downloadStatus !== null}
           />
 
-          <div>
+          <div style={{marginTop: '16px'}}>
             {!downloadStatus || downloadStatus === 'starting' ? (
               <Button
                 onClick={handleDownload}

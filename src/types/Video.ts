@@ -27,7 +27,7 @@ function mapYtSrVideo(target: Video, source: YtSrVideo) {
   target.id = source.id!
   target.title = source.title!
   target.description = source.description
-  target.durationFormatted = source.durationFormatted
+  target.durationFormatted = source.duration ? ms2duration(source.duration) : source.durationFormatted
   target.duration = source.duration
   target.uploadedAt = source.uploadedAt
   target.views = source.views
@@ -47,4 +47,11 @@ function mapYtplVideo(target: Video, source: YtplVideo) {
   target.url = source.url
   target.thumbnailUrl = source.bestThumbnail.url || undefined
   target.channel = new Channel(source.author.name)
+}
+
+
+function ms2duration(ms: number): string{
+  let date = new Date(0);
+  date.setMilliseconds(ms);
+  return date.toISOString().substr(11, 8);
 }

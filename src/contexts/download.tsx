@@ -20,6 +20,7 @@ export type DownloadProgress = {
   time: number
   timeLeft: number
   downloadUrl?: string
+  downloadFilename?: string
 }
 
 export type DownloadFunction = (video: Video, format: videoFormat, splitTracks?: boolean, cut?: Cut) => Promise<void>;
@@ -83,15 +84,19 @@ export const DownloaderProvider: React.FC = ({ children }) => {
     }
 
     try {
+
+      backend.socket.removeAllListeners('progress');
       backend.socket.on('progress', (v: DownloadProgress)=>{
         //console.log(211, v);
         progressCallback(v);
         if("finished" === v.status){
+          console.log(v);
           if(v.downloadUrl){
             new JsFileDownloader({
               url: v.downloadUrl
             }).then(() => {
               console.log('downloaded', v.downloadUrl)
+              backend.socket.emit('clearDownload', v.downloadFilename);
             });
           }
           clearDownload(video.id!, 4000);

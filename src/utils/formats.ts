@@ -32,7 +32,7 @@ export function filterBetterFormats(formats: videoFormat[]): videoFormat[] {
     })
   if (audioTrack) {
     audioTrack.extension = 'mp3'
-    result.push(audioTrack)
+    result.unshift(audioTrack)
   }
   return result
 }

@@ -106,7 +106,9 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
     if(player) {
       player.seekTo(cutFrom, true)
     }
-    handleCutToChange(cutTo);
+    if(cutFrom !== 0){
+      handleCutToChange(cutTo);
+    }
   }, [cutFrom]);
 
   async function loadFormats() {

@@ -55,6 +55,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
 
   const [cutFrom, setCutFrom] = useState(0);
   const [cutTo, setCutTo] = useState(0);
+  const [player, setPlayer] = useState<any>(null);
 
   const wasOpened = usePrevious(isOpen)
   const loadingVideo = useRef<string | null>(null)
@@ -83,10 +84,30 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
   })
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      console.log(player);
+      if(player){
+        console.log(player.getCurrentTime());
+        setCutFrom(Math.floor(player.getCurrentTime()));
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+
+  }, [player]);
+
+
+  useEffect(() => {
     if(video.duration) {
       setCutTo(Math.floor(video.duration/1000));
     }
   }, [video]);
+
+  useEffect(() => {
+    if(player) {
+      player.seekTo(cutFrom, true)
+    }
+    handleCutToChange(cutTo);
+  }, [cutFrom]);
 
   async function loadFormats() {
     setFormats({ data: [], loading: true })
@@ -122,7 +143,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
         Math.floor((video.duration || 0) / 1000)
     );
     console.log(v, nv, cutFrom)
-    handleCutToChange(cutTo, nv);
+    //handleCutToChange(cutTo, nv);
     setCutFrom(nv);
   }
 
@@ -158,6 +179,9 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
           <Box position="relative">
             <YouTube videoId={video.id}
                      opts={{width: '100%'}}
+                     onReady={event => {
+                       setPlayer(event.target);
+                     }}
             />
             <Flex direction="row" align="center" justify="flex-start" style={{marginTop: '8px'}}>
 
@@ -213,7 +237,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
               paddingX="4px"
               textAlign="center"
             >
-              {TimeFormat.fromS(cutFrom+cutTo, 'hh:mm:ss')} / {video.durationFormatted}
+              {TimeFormat.fromS(cutFrom, 'hh:mm:ss')} - {TimeFormat.fromS(cutFrom+cutTo, 'hh:mm:ss')}
             </Text>
           </Box>
 

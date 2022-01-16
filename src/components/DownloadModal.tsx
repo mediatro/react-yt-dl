@@ -31,6 +31,8 @@ import Progress from './Progress'
 import usePrevious from '../hooks/usePrevious'
 import {BackendContext} from "../contexts/backend";
 import YouTube from "react-youtube";
+import TimeFormat from 'hh-mm-ss';
+import InputMask from 'react-input-mask';
 
 interface DownloadModalProps {
   video: Video
@@ -107,22 +109,33 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
 
   async function handleDownload() {
     try {
-      await download(video, formats.data[selected], splitTracks, {from: cutFrom, to: cutTo})
+      await download(video, formats.data[selected], splitTracks, {from: cutFrom, to: cutFrom+cutTo})
     } catch (err) {
       console.error(err)
     }
   }
 
   const handleCutFromChange = (v: number) => {
-    let nv = Math.max(0, v);
+
+    let nv = Math.min(
+        Math.max(0, v),
+        Math.floor((video.duration || 0) / 1000)
+    );
+    console.log(v, nv, cutFrom)
+    handleCutToChange(cutTo, nv);
     setCutFrom(nv);
-    //setCutTo(Math.max(nv, cutTo));
   }
 
-  const handleCutToChange = (v: number) => {
+  const handleCutToChange = (v: number, from?: number) => {
+    if(!v) {
+      v= 0;
+    }
+    if(!from){
+      from = cutFrom;
+    }
     let nv = Math.max(0,
         Math.min(
-            Math.floor((video.duration || 0) /1000),
+            Math.floor((video.duration || 0) /1000) - from,
             v
         )
     );
@@ -147,13 +160,35 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
                      opts={{width: '100%'}}
             />
             <Flex direction="row" align="center" justify="flex-start" style={{marginTop: '8px'}}>
-                <Input placeholder='From'
+
+              <InputMask mask="99:99:99"
+                         value={TimeFormat.fromS(cutFrom, 'hh:mm:ss')}
+                         onChange={(event: any) => {
+                           try {
+                             handleCutFromChange(TimeFormat.toS(event.target.value.replace(/_/g, '0'), 'hh:mm:ss'))
+                           }catch (e){
+                             console.log(event.target.value, e)
+                           }
+                         }}
+              >
+                {(inputProps: any) => <Input {...inputProps} style={{marginRight:'8px'}} />}
+              </InputMask>
+
+               {/* <Input placeholder='From'
                        type={"number"}
-                       value={cutFrom}
-                       onChange={event => handleCutFromChange(parseInt(event.target.value))}
+                       value={TimeFormat.fromS(cutFrom, 'hh:mm:ss')}
+                       onChange={event => {
+                         try {
+                           handleCutFromChange(TimeFormat.toS(event.target.value, 'hh:mm:ss'))
+                         }catch (e){
+                           console.log(event.target.value, e)
+                         }
+
+
+                       }}
                        style={{marginRight:'8px'}}
-                />
-                <Input placeholder='To'
+                />*/}
+                <Input placeholder='Duration'
                        type={"number"}
                        value={cutTo}
                        onChange={event => handleCutToChange(parseInt(event.target.value))}
@@ -170,7 +205,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
             <Text
               background="blackAlpha.800"
               fontWeight="bold"
-              position="absolute"
+              /*position="absolute"*/
               bottom="1"
               right="1"
               fontSize="smaller"
@@ -178,7 +213,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
               paddingX="4px"
               textAlign="center"
             >
-              {video.durationFormatted}
+              {TimeFormat.fromS(cutFrom+cutTo, 'hh:mm:ss')} / {video.durationFormatted}
             </Text>
           </Box>
 

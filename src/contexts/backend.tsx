@@ -21,6 +21,7 @@ export class BackendService {
 
     download(filename: string){
         return new JsFileDownloader({
+            filename: filename,
             url: `${apiUrl}/download/?filename=${filename}`
         }).then(() => {
             console.log('downloaded', filename);

@@ -22,7 +22,7 @@ export class BackendService {
     download(filename: string){
         return new JsFileDownloader({
             filename: filename,
-            url: `${apiUrl}/download/?filename=${filename}`
+            url: `${apiUrl}/download/?filename=${encodeURIComponent(filename)}`
         }).then(() => {
             console.log('downloaded', filename);
             //backend.socket.emit('clearDownload', v.downloadFilename);

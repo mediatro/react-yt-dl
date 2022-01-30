@@ -54,6 +54,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
   });
 
   const [cutFrom, setCutFrom] = useState(0);
+  const [controlled, setControlled] = useState(false);
   const [cutTo, setCutTo] = useState(0);
   const [player, setPlayer] = useState<any>(null);
 
@@ -85,7 +86,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log(player);
+      //console.log(player);
       if(player){
         console.log(player.getCurrentTime());
         setCutFrom(Math.floor(player.getCurrentTime()));
@@ -103,7 +104,8 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
   }, [video]);
 
   useEffect(() => {
-    if(player) {
+    if(controlled && player) {
+      setControlled(false);
       player.seekTo(cutFrom, true)
     }
     if(cutFrom !== 0){
@@ -146,6 +148,7 @@ const DownloadModal: React.FC<DownloadModalProps> = ({
     );
     console.log(v, nv, cutFrom)
     //handleCutToChange(cutTo, nv);
+    setControlled(true);
     setCutFrom(nv);
   }
 
